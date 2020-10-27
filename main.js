@@ -14,10 +14,17 @@ let multiples = 0;
 let maxYPos = 0;
 const padding = 10;
 
+const columns = 40;
+let xIndex = 0;
+let rows = null;
+let yIndex = 0;
+
 function setup() {
 	createCanvas(windowWidth, windowHeight);
 	graphics = createGraphics(100, 100);
 	graphics.noFill();
+	// graphics.strokeWeight(5);
+	// graphics.stroke(255);
 
 	for(let i=0; i<8; i++){
 		lineGraphics.push(createGraphics(100, 100));
@@ -48,22 +55,33 @@ function setup() {
 
 	codeGlyphs = textToGlyphIndex(testText);
 
-	charWidth = (width - padding * 2)/40;
+	charWidth = (width - padding * 2) / columns;
+	rows = Math.floor((height - padding * 2) / charWidth);
 
 	frameRate(60);
 	background(0);
 
 	if(getFrame){
 		noLoop();
-		const vertLines = floor(height / charWidth);
 
-		for(let j=1; j<vertLines * 40; j++){
+		for(let j=1; j < columns * rows; j++){
+			resetMatrix();
 			draw();
 		}
 	}
 }
 
 function draw() {
+	if(xIndex >= columns){
+		xIndex = 0;
+		yIndex++;
+	}
+
+	if(yIndex >= rows){
+		yIndex = 0;
+		background(0);
+	}
+
 	translate(padding, padding);
 
 	const squareLength = graphics.width/2;
@@ -77,36 +95,37 @@ function draw() {
 			const glyph = parseInt(codeGpyph[cell]);
 
 			graphics.image(lineGraphics[glyph], x * squareLength, y * squareLength, squareLength, squareLength);
+			graphics.rect(0, 0, 100, 100);
 		}
 	}
 
-	const xPos = (charWidth * i) % (width - padding * 2);
-	const yPos = Math.floor((charWidth * i) / (width - padding * 2)) * charWidth - multiples * maxYPos;
+	const xPos = charWidth * xIndex;
+	const yPos = charWidth * yIndex;
 
-	if(yPos + charWidth > (height - padding * 2)){
-		multiples++;
-		maxYPos = yPos;
-		background(0);
-	}else if(i < codeGlyphs.length - 1){
+	if(i < codeGlyphs.length - 1){
 		image(graphics, xPos, yPos, charWidth, charWidth);
 
 		i++;
+		xIndex++;
 	}
 }
 
 function windowResized(){
+	resizeCanvas(windowWidth, windowHeight);
+	background(0);
+	resetMatrix();
+	charWidth = (width - padding * 2) / columns;
+	rows = Math.floor((height - padding * 2) / charWidth);
+
+	i=0;
+	xIndex = 0;
+	yIndex = 0;
+
 	if(getFrame){
-		resizeCanvas(windowWidth, windowHeight);
-		background(0);
-		i=0;
-		multiples=0;
-		maxYPos=0;
-		charWidth = (width - padding * 2)/40;
-
 		noLoop();
-		const vertLines = floor(height / charWidth);
 
-		for(let j=1; j<vertLines * 40; j++){
+		for(let j=0; j < rows * columns; j++){
+			resetMatrix();
 			draw();
 		}
 	}
