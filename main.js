@@ -12,6 +12,7 @@ let charWidth;
 let i = 0;
 let multiples = 0;
 let maxYPos = 0;
+const padding = 10;
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
@@ -47,7 +48,7 @@ function setup() {
 
 	codeGlyphs = textToGlyphIndex(testText);
 
-	charWidth = width/40;
+	charWidth = (width - padding * 2)/40;
 
 	frameRate(60);
 	background(0);
@@ -63,6 +64,8 @@ function setup() {
 }
 
 function draw() {
+	translate(padding, padding);
+
 	const squareLength = graphics.width/2;
 
 	graphics.clear();
@@ -77,10 +80,10 @@ function draw() {
 		}
 	}
 
-	const xPos = (charWidth * i) % width;
-	const yPos = Math.floor((charWidth * i) / width) * charWidth - multiples * maxYPos;
+	const xPos = (charWidth * i) % (width - padding * 2);
+	const yPos = Math.floor((charWidth * i) / (width - padding * 2)) * charWidth - multiples * maxYPos;
 
-	if(yPos + charWidth > height){
+	if(yPos + charWidth > (height - padding * 2)){
 		multiples++;
 		maxYPos = yPos;
 		background(0);
@@ -98,7 +101,7 @@ function windowResized(){
 		i=0;
 		multiples=0;
 		maxYPos=0;
-		charWidth = width/40;
+		charWidth = (width - padding * 2)/40;
 
 		noLoop();
 		const vertLines = floor(height / charWidth);
